@@ -1,0 +1,6 @@
+MX tiene 
+a: patente
+u:modelo de utilidad
+f: diseño industrial
+
+Ejemplo de url: MX/a/{año}/{expediente}

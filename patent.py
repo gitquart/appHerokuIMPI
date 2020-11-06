@@ -34,12 +34,11 @@ browser=webdriver.Chrome(options=options)
 StartID=5000
 EndID=14000
 countExpedient=0
-lsLetras=['a','b']
 
 
 for i in range(StartID,EndID):
     #This iteration gets each file
-    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id=MX/"+str(l)+"/2015/00"+str(i)
+    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id=MX/a/2015/00"+str(i)
     response= requests.get(urlExp)
     status= response.status_code
     if status==200:
