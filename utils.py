@@ -38,10 +38,34 @@ def processRows(browser,row):
             continue  
         if col==7:
             row=int(row)-1
-            pdfButton=browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente_ImageButton1_'+str(row)+'"]')[0]
-            pdfButton.click()
+            javaScript = "document.getElementById('MainContent_gdDoctosExpediente_ImageButton1_"+str(row)+"').click();"
+            browser.execute_script(javaScript)
             #Get the name of the pdf document
-            time.sleep(20)
+            time.sleep(10)
+            pdf_name=document.replace('/','_')
+            pdf_file_name=pdf_name+'.pdf'
+            pdf_source=''
+            pdf_source = browser.find_element_by_tag_name('iframe').get_attribute("src")
+            time.sleep(2)
+            if pdf_source!='':
+                #Get the url of the source
+                browser.get(pdf_source)
+                time.sleep(5)
+                #Finf the href with innerText 'aquí'
+                lst_link=browser.find_elements_by_tag_name('a')
+                linkFound=False
+                for link in lst_link:
+                    if linkFound==False:   
+                        if link.text=='aquí':
+                            linkFound=True
+                            link.click()
+                            #Wait 'X' seconds for download
+                            time.sleep(10) 
+                            #Get the expedient web page again, due to change of pages
+                            #it is needed to come back to a prior page
+                            browser.execute_script('window.history.go(-1)')
+                            browser.refresh()
+                            continue
             
 
     
