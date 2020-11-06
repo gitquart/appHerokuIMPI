@@ -17,27 +17,32 @@ def appendInfoToFile(path,filename,strcontent):
     txtFile.close()
 
 
-def processRows(browser,row,strSearch):
+def processRows(browser,row):
     pdfDownloaded=False
-    for col in range(1,6):
+    for col in range(2,8):
+        xPathContent='//*[@id="MainContent_gdDoctosExpediente"]/tbody/tr['+str(row)+']/td['+str(col)+']';
         if col==2:
-            namePDF=browser.find_elements_by_xpath('//*[@id="dtRresul_data"]/tr['+str(row)+']/td['+str(col)+']')[0].text
+            barcode=browser.find_elements_by_xpath(xPathContent)[0].text
+            continue
         if col==3:
-            dt_date=browser.find_elements_by_xpath('//*[@id="dtRresul_data"]/tr['+str(row)+']/td['+str(col)+']')[0].text
+            document=browser.find_elements_by_xpath(xPathContent)[0].text
+            continue
         if col==4:
-            region=browser.find_elements_by_xpath('//*[@id="dtRresul_data"]/tr['+str(row)+']/td['+str(col)+']')[0].text
+            description=browser.find_elements_by_xpath(xPathContent)[0].text
+            continue
         if col==5:
-            court=browser.find_elements_by_xpath('//*[@id="dtRresul_data"]/tr['+str(row)+']/td['+str(col)+']')[0].text                    
-
-        if col==1:
-            #This is the xpath of the link : //*[@id="grdSentencias_ctl00__'+str(row)+'"]/td['+str(col)+']/a
-            #This find_element method works!
-            pdfButton=browser.find_elements_by_xpath('//*[@id="dtRresul_data"]/tr['+str(row)+']/td['+str(col)+']')[0]
+            typeDoc=browser.find_elements_by_xpath(xPathContent)[0].text
+            continue
+        if col==6:
+            dt=browser.find_elements_by_xpath(xPathContent)[0].text  
+            continue  
+        if col==7:
+            row=int(row)-1
+            pdfButton=browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente_ImageButton1_'+str(row)+'"]')[0]
             pdfButton.click()
+            #Get the name of the pdf document
             time.sleep(20)
-            #The file is downloaded rare, then just renaming it solves the issue
-            for file in os.listdir(download_dir):
-                os.rename(download_dir+'\\'+file,download_dir+'\\00000.pdf')
+            
 
     
        
