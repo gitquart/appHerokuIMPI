@@ -136,8 +136,7 @@ This method converts from PDF to txt file
 It includes the source of pdf with complete path, the destination folder and the extension
 of file to convert to.
 """
-def convertPdf(fileWithPath,destinationFolder,extensionToConvert):
-     
+def convertPdf(fileWithPath,destinationFolder,extensionToConvert): 
     #PDF pages are 0-based
     if fileWithPath.endswith(".pdf") or fileWithPath.endswith(".PDF"):
         #Split thr paths
