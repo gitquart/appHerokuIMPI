@@ -70,7 +70,7 @@ def processRows(browser,row):
 
     
        
-    #Build the json by row            
+    #Build the json by row  ffff           
     with open('json_sentencia.json') as json_file:
         json_sentencia = json.load(json_file)
 
