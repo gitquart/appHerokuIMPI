@@ -7,6 +7,7 @@ import time
 import json
 import os
 import sys
+from textwrap import wrap
 
 
 download_dir='C:\\Users\\1098350515\\Downloads'
@@ -60,7 +61,7 @@ def processRows(browser,row):
                             linkFound=True
                             link.click()
                             #Wait 'X' seconds for download
-                            time.sleep(20) 
+                            time.sleep(40) 
                             #Get the expedient web page again, due to change of pages
                             #it is needed to come back to a prior page
                             browser.execute_script('window.history.go(-1)')
@@ -92,19 +93,22 @@ def processRows(browser,row):
     json_doc['strdt']=fullTimeStamp
     json_doc['year']=int(dYear)
     #Check if a pdf exists                       
-    json_doc['pdf']=''
+    json_doc['lspdf'].clear()
 
-    strContent=''              
+    strContent='' 
+    lsContent=[]             
     for file in os.listdir(download_dir):
         pdfDownloaded=True
         strFile=file.split('.')[1]
         if strFile=='PDF' or strFile=='pdf':
-            strContent=readPDF(file)        
+            strContent=readPDF(file) 
+            lsContent=wrap(strContent,100)       
 
     #When pdf is done and the record is in cassandra, delete all files in download folder
     #If the pdf is not downloaded but the window is open, save the data without pdf
     if pdfDownloaded==True:
-        json_doc['pdf']=strContent
+        for content in lsContent:
+            json_doc['lspdf'].append(content)
         for file in os.listdir(download_dir):
             os.remove(download_dir+'\\'+file) 
 
