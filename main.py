@@ -5,9 +5,13 @@ import requests
 from selenium.webdriver.chrome.options import Options
 import os
 import utils as tool
+import cassandraSent as bd
 
 chromedriver_autoinstaller.install()
 download_dir='C:\\Users\\1098350515\\Downloads'
+print('Deleting all in download folder...')
+for file in os.listdir(download_dir):
+    os.remove(download_dir+'\\'+file)
 #Set options for chrome
 options = Options()
 
@@ -22,14 +26,13 @@ profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer
 options.add_experimental_option("prefs", profile)
 
 browser=webdriver.Chrome(options=options)
-#Start 13000
-StartID=5000
-EndID=14000
-countExpedient=0
 
-for i in range(StartID,EndID):
+lsInfo=bd.getPageAndTopic()
+StartID=int(lsInfo[1])
+EndID=14000
+while(StartID<=EndID):
     #This iteration gets each file
-    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id=MX/a/2015/00"+str(i)
+    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id=MX/a/2015/00"+str(StartID)
     response= requests.get(urlExp)
     status= response.status_code
     if status==200:
@@ -43,5 +46,7 @@ for i in range(StartID,EndID):
             nRows=len(rows)+1
             for trow in range(1,nRows):
                 tool.processRows(browser,trow)
-
-            print('...')
+    
+            print('-------------Page done-------------')
+            StartID=StartID+1
+            bd.updatePage(StartID)

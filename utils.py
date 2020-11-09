@@ -60,76 +60,71 @@ def processRows(browser,row):
                             linkFound=True
                             link.click()
                             #Wait 'X' seconds for download
-                            time.sleep(10) 
+                            time.sleep(20) 
                             #Get the expedient web page again, due to change of pages
                             #it is needed to come back to a prior page
                             browser.execute_script('window.history.go(-1)')
                             browser.refresh()
-                            continue
-            
-
+                            continue   
     
-       
-    #Build the json by row  ffff           
-    with open('json_sentencia.json') as json_file:
-        json_sentencia = json.load(json_file)
+    #Build the json by row           
+    with open('json_file.json') as json_file:
+        json_doc = json.load(json_file)
 
-    json_sentencia['id']=str(uuid.uuid4())
-    json_sentencia['court_room']=court
-    json_sentencia['pdfname']=namePDF
+    json_doc['id']=str(uuid.uuid4())
+    json_doc['barcode']=barcode
+    json_doc['document']=document
     #Working with the date, this field will deliver:
     #1.Date field,2. StrField and 3.year
     # timestamp accepted for cassandra: 
     # yyyy-mm-dd  , yyyy-mm-dd HH:mm:ss
     #In web site, the date comes as 27-10-2020 14:38:00
     data=''
-    data=dt_date.split(' ')
+    data=dt.split(' ')
     dDate=str(data[0]).split('-')
     dDay=dDate[0]
     dMonth=dDate[1]
     dYear=dDate[2]
-    dTime=data[1]
-    fullTimeStamp=dYear+'-'+dMonth+'-'+dDay+' '+dTime;
-    json_sentencia['year']=int(dYear)
-    json_sentencia['region']=region
-    json_sentencia['publication_datetime']=fullTimeStamp
-    json_sentencia['strpublicationdatetime']=fullTimeStamp
+    fullTimeStamp=dYear+'-'+dMonth+'-'+dDay;
+    json_doc['description']=description
+    json_doc['typedoc']=typeDoc
+    json_doc['dt']=fullTimeStamp
+    json_doc['strdt']=fullTimeStamp
+    json_doc['year']=int(dYear)
     #Check if a pdf exists                       
-    json_sentencia['lspdfcontent'].clear()
-                  
-    lsContent=[]  
+    json_doc['pdf']=''
+
+    strContent=''              
     for file in os.listdir(download_dir):
         pdfDownloaded=True
         strFile=file.split('.')[1]
         if strFile=='PDF' or strFile=='pdf':
-            lsContent=readPDF(file)        
+            strContent=readPDF(file)        
 
     #When pdf is done and the record is in cassandra, delete all files in download folder
     #If the pdf is not downloaded but the window is open, save the data without pdf
     if pdfDownloaded==True:
+        json_doc['pdf']=strContent
         for file in os.listdir(download_dir):
-            for item in lsContent:
-                json_sentencia['lspdfcontent'].append(item)
-            for file in os.listdir(download_dir):
-                os.remove(download_dir+'\\'+file) 
+            os.remove(download_dir+'\\'+file) 
 
     #Insert information to cassandra
-    res=bd.cassandraBDProcess(json_sentencia)
+    res=bd.cassandraBDProcess(json_doc)
     if res:
-        print('Sentencia added:',str(namePDF))
+        print('Record added:',str(document))
     else:
-        print('Keep going...sentencia existed:',str(namePDF)) 
+        print('Keep going...record existed:',str(document)) 
                     
 """
 readPDF is done to read a PDF no matter the content, can be image or UTF-8 text
 """
 def readPDF(file):
-    lsContent=[]
+    strContent=''
     with open(download_dir+'\\'+file, "rb") as imageFile:
         bContent = base64.b64encode(imageFile.read()).decode('utf-8')
     
-    lsContent.append(bContent)
-    return lsContent   
+    strContent=bContent
+    return strContent  
     
                   
 
