@@ -9,9 +9,17 @@ import cassandraSent as bd
 
 chromedriver_autoinstaller.install()
 download_dir='/app/Downloadimpi'
-print('Deleting all in download folder...')
+#Erase every file in download folder at the beginning to avoid mixed files
+print('Checking if download folder exists...')
+isdir = os.path.isdir(download_dir)
+if isdir==False:
+    print('Creating download folder...')
+    os.mkdir(download_dir)
+print('Download directory created...')
 for file in os.listdir(download_dir):
-    os.remove(download_dir+'\\'+file)
+    os.remove(download_dir+'/'+file)
+
+print('Download folder empty...')
 #Set options for chrome
 options = Options()
 
