@@ -164,7 +164,7 @@ def processPDF(json_sentencia,lsRes):
             else:
                 json_documento['idDocumento']=lsRes[1]
 
-            json_documento['documento']=json_sentencia['documento']
+            json_documento['documento']=json_sentencia['document']
             json_documento['fuente']='impi'
             totalElements=len(lsContent)
             result=insertPDFChunks(0,0,0,totalElements,lsContent,json_documento,0)
