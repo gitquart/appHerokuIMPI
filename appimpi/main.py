@@ -8,7 +8,7 @@ import utils as tool
 import cassandraSent as bd
 
 chromedriver_autoinstaller.install()
-download_dir='C:\\Users\\1098350515\\Downloads'
+download_dir='/app/Downloadimpi'
 print('Deleting all in download folder...')
 for file in os.listdir(download_dir):
     os.remove(download_dir+'\\'+file)

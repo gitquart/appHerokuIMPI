@@ -7,7 +7,7 @@ import os
 pathToHere=os.getcwd()
 
 cloud_config= {
-        'secure_connect_bundle': pathToHere+'\\secure-connect-dbquart.zip'
+        'secure_connect_bundle': '/app/appimpi/secure-connect-dbquart.zip'
     }
               
 def cassandraBDProcess(json_doc):
@@ -28,9 +28,15 @@ def cassandraBDProcess(json_doc):
                 
     future = session.execute_async(querySt)
     row=future.result()
+    lsRes=[]
         
     if row: 
         record_added=False
+        valid=''
+        for val in row:
+            valid=str(val[0])
+        lsRes.append(record_added) 
+        lsRes.append(valid)   
         cluster.shutdown()
     else:        
         #Insert Data as JSON
@@ -39,10 +45,11 @@ def cassandraBDProcess(json_doc):
         future = session.execute_async(insertSt)
         future.result()  
         record_added=True
-        cluster.shutdown()     
+        lsRes.append(record_added)
+        cluster.shutdown()         
                     
                          
-    return record_added
+    return lsRes
 
 def updatePage(page):
 
@@ -83,6 +90,39 @@ def getPageAndTopic():
                     
                          
     return lsInfo    
+
+
+def insertPDF(json_doc):
+     
+    record_added=False
+
+    #Connect to Cassandra
+    objCC=CassandraConnection()
+    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
+    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    session = cluster.connect()
+    session.default_timeout=100
+
+    iddocumento=str(json_doc['idDocumento'])
+    documento=str(json_doc['documento'])
+    fuente=str(json_doc['fuente'])
+    secuencia=str(json_doc['secuencia'])
+    querySt="select id from thesis.tbDocumento_impi where iddocumento="+iddocumento+" and documento='"+documento+"' and fuente='"+fuente+"' AND secuencia="+secuencia+"  ALLOW FILTERING"          
+    future = session.execute_async(querySt)
+    row=future.result()
+
+    if row:
+        cluster.shutdown()
+    else:    
+        jsonS=json.dumps(json_doc)           
+        insertSt="INSERT INTO thesis.tbDocumento_impi JSON '"+jsonS+"';" 
+        future = session.execute_async(insertSt)
+        future.result()  
+        record_added=True
+        cluster.shutdown()     
+                    
+                         
+    return record_added         
 
    
 class CassandraConnection():
