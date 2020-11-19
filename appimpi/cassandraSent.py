@@ -5,7 +5,7 @@ from cassandra.query import SimpleStatement
 import os
 
 pathToHere=os.getcwd()
-
+timeOut=1000000
 cloud_config= {
         'secure_connect_bundle': '/app/appimpi/secure-connect-dbquart.zip'
     }
@@ -19,7 +19,7 @@ def cassandraBDProcess(json_doc):
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect()
-    session.default_timeout=70
+    session.default_timeout=timeOut
     row=''
     value=json_doc['document']
     #Check wheter or not the record exists, check by numberFile and date
@@ -58,7 +58,7 @@ def updatePage(page):
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect()
-    session.default_timeout=70
+    session.default_timeout=timeOut
     page=str(page)
     querySt="update thesis.cjf_control set page="+page+" where id_control=3;"          
     future = session.execute_async(querySt)
@@ -73,7 +73,7 @@ def getPageAndTopic():
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect()
-    session.default_timeout=70
+    session.default_timeout=timeOut
     row=''
     querySt="select query,page from thesis.cjf_control where id_control=3  ALLOW FILTERING"           
     future = session.execute_async(querySt)
@@ -101,7 +101,7 @@ def insertPDF(json_doc):
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect()
-    session.default_timeout=100
+    session.default_timeout=timeOut
 
     iddocumento=str(json_doc['idDocumento'])
     documento=str(json_doc['documento'])
