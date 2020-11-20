@@ -46,19 +46,27 @@ while(StartID<=EndID):
     if status==200:
         browser.get(urlExp)
         time.sleep(1)
-        #Check if the url (File= expedient) has a table, if table is  none, then skip til next url
-        table=browser.find_element_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
-        if table is not None:
-            #Get nomber of rows of the table
-            rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
-            nRows=len(rows)+1
-            for trow in range(1,nRows):
-                tool.processRows(browser,trow)
+        alerta=browser.find_element_by_xpath('//*[@id="divAlertas"]/div/strong')
+        if alerta is None:
+            print('No alert of NO FILE found...all good')
+            #Check if the url (File= expedient) has a table, if table is  none, then skip til next url
+            table=browser.find_element_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
+            if table is not None:
+                #Get nomber of rows of the table
+                rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
+                nRows=len(rows)+1
+                for trow in range(1,nRows):
+                    tool.processRows(browser,trow)
     
-            print('-------------Page done-------------')
+                print('-------------Page done-------------')
+                StartID=StartID+1
+                bd.updatePage(StartID)
+            else:
+                print('No table found...')
+        else:
+            print('------No existe el expediente solicitado------')
             StartID=StartID+1
             bd.updatePage(StartID)
-        else:
-            print('No table found...')  
+
     else:
         print('The IMPI site is not responding....')          
