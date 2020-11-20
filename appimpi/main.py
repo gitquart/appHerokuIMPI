@@ -44,6 +44,7 @@ while(StartID<=EndID):
     response= requests.get(urlExp)
     status= response.status_code
     if status==200:
+        print('Reading page...')
         browser.get(urlExp)
         time.sleep(1)
         if browser.find_elements_by_xpath('//*[@id="divAlertas"]/div/strong').count==0:
