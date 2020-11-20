@@ -46,7 +46,7 @@ while(StartID<=EndID):
     if status==200:
         browser.get(urlExp)
         time.sleep(1)
-        if browser.find_element_by_xpath('//*[@id="divAlertas"]/div/strong'):
+        if browser.find_elements_by_xpath('//*[@id="divAlertas"]/div/strong').count==0:
             print('------No existe el expediente solicitado------')
             StartID=StartID+1
             bd.updatePage(StartID)
