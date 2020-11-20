@@ -32,9 +32,7 @@ profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer
                }           
 
 options.add_experimental_option("prefs", profile)
-
 browser=webdriver.Chrome(options=options)
-
 lsInfo=bd.getPageAndTopic()
 StartID=int(lsInfo[1])
 EndID=14000
@@ -50,13 +48,12 @@ while(StartID<=EndID):
         if browser.find_elements_by_xpath('//*[@id="divAlertas"]/div/strong').count==0:
             print('------No existe el expediente solicitado------')
             StartID=StartID+1
-            bd.updatePage(StartID)
-            
+            bd.updatePage(StartID)    
         else:
             print('No alert of NO FILE found...all good')
             #Check if the url (File= expedient) has a table, if table is  none, then skip til next url
-            table=browser.find_element_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
-            if table is not None:
+            table=browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
+            if table.count>0:
                 #Get nomber of rows of the table
                 rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
                 nRows=len(rows)+1
