@@ -98,11 +98,14 @@ def processRows(browser,row):
         print('Record added:',str(document))
     else:
         print('Keep going...record existed:',str(document))                       
-            
+
+    #20-nov-2020: Stop this part meanwhile, insert metadata only
+    """        
     for file in os.listdir(download_dir):
         pdfDownloaded=True
         processPDF(json_doc,lsRes)
         os.remove(download_dir+'/'+file)
+    """    
             
 
 
