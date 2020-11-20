@@ -58,3 +58,7 @@ while(StartID<=EndID):
             print('-------------Page done-------------')
             StartID=StartID+1
             bd.updatePage(StartID)
+        else:
+            print('No table found...')  
+    else:
+        print('The IMPI site is not responding....')          
