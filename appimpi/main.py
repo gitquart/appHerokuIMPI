@@ -52,8 +52,7 @@ while(StartID<=EndID):
         else:
             print('No alert of NO FILE found...all good')
             #Check if the url (File= expedient) has a table, if table is  none, then skip til next url
-            table=browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
-            if table.count>0:
+            if browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]').count>0:
                 #Get nomber of rows of the table
                 rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
                 nRows=len(rows)+1
