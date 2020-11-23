@@ -70,6 +70,12 @@ def processRows(browser,row):
     
     #Build the json by row           
     json_doc=devuelveJSON('/app/appimpi/json_file.json')
+    #Add folder Name (Expediente)
+    folderName=''
+    folderName=browser.find_elements_by_xpath('//*[@id="MainContent_upVisor"]/h3')[0].text
+    folderChunks=folderName.split(' ')
+    json_doc['folder']=str(folderChunks[1])
+    print('Adding folder:',str(folderChunks[1]))
     json_doc['id']=str(uuid.uuid4())
     json_doc['barcode']=barcode
     json_doc['document']=document
