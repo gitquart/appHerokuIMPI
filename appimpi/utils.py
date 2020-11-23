@@ -18,7 +18,7 @@ def appendInfoToFile(path,filename,strcontent):
     txtFile.close()
 
 
-def processRows(browser,row):
+def processRows(browser,row,folderName):
     pdfDownloaded=False
     for col in range(2,8):
         xPathContent='//*[@id="MainContent_gdDoctosExpediente"]/tbody/tr['+str(row)+']/td['+str(col)+']';
@@ -70,12 +70,7 @@ def processRows(browser,row):
     
     #Build the json by row           
     json_doc=devuelveJSON('/app/appimpi/json_file.json')
-    #Add folder Name (Expediente)
-    folderName=''
-    folderName=browser.find_elements_by_xpath('//*[@id="MainContent_upVisor"]/h3')[0].text
-    folderChunks=folderName.split(' ')
-    json_doc['folder']=str(folderChunks[1])
-    print('Adding folder:',str(folderChunks[1]))
+    json_doc['folder']=folderName
     json_doc['id']=str(uuid.uuid4())
     json_doc['barcode']=barcode
     json_doc['document']=document

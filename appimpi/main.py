@@ -55,10 +55,15 @@ while(StartID<=EndID):
             #Check if the url (File= expedient) has a table, if table is  none, then skip til next url
             if table is not None:
                 #Get nomber of rows of the table
+                folderName=''
+                folderName=browser.find_elements_by_xpath('//*[@id="MainContent_upVisor"]/h3')[0].text
+                folderChunks=folderName.split(' ')
+                folderName=str(folderChunks[1])
+                print('Adding folder: ',folderName)
                 rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
                 nRows=len(rows)+1
                 for trow in range(1,nRows):
-                    tool.processRows(browser,trow)
+                    tool.processRows(browser,trow,folderName)
                 print('-------------Page done-------------')
                 StartID=StartID+1
                 bd.updatePage(StartID)
