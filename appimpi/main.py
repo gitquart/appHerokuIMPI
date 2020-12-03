@@ -71,4 +71,8 @@ while(StartID<=EndID):
                 print('No table found...')
 
     else:
-        print('The IMPI site is not responding....')          
+        print('The IMPI site is not responding....') 
+if(StartID>=EndID):
+    print('-----------------------------------------------')
+    print('Please change URL, the folders are all read...') 
+    print('-----------------------------------------------')                
