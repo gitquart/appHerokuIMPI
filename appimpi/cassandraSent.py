@@ -65,30 +65,18 @@ def updatePage(page):
                          
     return True
 
-def getPageAndTopic():
-
-    #Connect to Cassandra
+def returnQueryResult(querySt):
     objCC=CassandraConnection()
     auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect()
     session.default_timeout=timeOut
-    row=''
-    querySt="select query,page from thesis.cjf_control where id_control=3  ALLOW FILTERING"           
+    result=''
     future = session.execute_async(querySt)
-    row=future.result()
-    lsInfo=[]
-        
-    if row: 
-        for val in row:
-            lsInfo.append(str(val[0]))
-            lsInfo.append(str(val[1]))
-            print('Value from cassandra:',str(val[0]))
-            print('Value from cassandra:',str(val[1]))
-        cluster.shutdown()
-                    
-                         
-    return lsInfo    
+    result=future.result()
+    cluster.shutdown()
+
+    return result  
 
 
 def insertPDF(json_doc):

@@ -33,8 +33,19 @@ profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer
 
 options.add_experimental_option("prefs", profile)
 browser=webdriver.Chrome(options=options)
-lsInfo=bd.getPageAndTopic()
-StartID=int(lsInfo[1])
+querySt="select query,page,lscontrol from thesis.cjf_control where id_control=5  ALLOW FILTERING"
+resultSet=bd.returnQueryResult(querySt)
+lsControl=[]
+StartID=0
+
+if resultSet: 
+    for row in resultSet:
+        print('Service name:',str(row[0]))
+        print('Starting page::',str(row[1]))
+        StartID=int(str(row[1]))
+        for e in row[2]:
+            lsControl.append(e)
+            
 EndID=14000
 while(StartID<=EndID):
     #This iteration gets each file
