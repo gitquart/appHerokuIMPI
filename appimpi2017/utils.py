@@ -8,9 +8,12 @@ import json
 import os
 import sys
 from textwrap import wrap
+from InternalControl import cInternalControl
+
+objControl=cInternalControl()
 
 
-download_dir='/app/Downloadimpi'
+download_dir='/app/Download'+objControl.hfolder
 
 def appendInfoToFile(path,filename,strcontent):
     txtFile=open(path+filename,'a+')
@@ -69,7 +72,7 @@ def processRows(browser,row,folderName):
                             continue   
     
     #Build the json by row           
-    json_doc=devuelveJSON('/app/appimpi/json_file.json')
+    json_doc=devuelveJSON('/app/'+objControl.hfolder+'/json_file.json')
     json_doc['folder']=folderName
     json_doc['id']=str(uuid.uuid4())
     json_doc['barcode']=barcode
@@ -162,7 +165,7 @@ def processPDF(json_sentencia,lsRes):
             strContent=readPDF(file) 
             print('Start wrapping text...') 
             lsContent=wrap(strContent,1000)  
-            json_documento=devuelveJSON('/app/appimpi/json_documento.json')
+            json_documento=devuelveJSON('/app/'+objControl.hfolder+'/json_documento.json')
             if lsRes[0]:
                 json_documento['idDocumento']=json_sentencia['id']
             else:
