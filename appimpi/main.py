@@ -49,7 +49,7 @@ if resultSet:
 EndID=14000
 while(StartID<=EndID):
     #This iteration gets each file
-    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id=MX/a/2015/"+str(StartID).zfill(6)
+    urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id="+str(lsControl[0])+"/"+str(lsControl[1])+"/"+str(lsControl[2])+"/"+str(StartID).zfill(6)
     response= requests.get(urlExp)
     status= response.status_code
     if status==200:
