@@ -3,11 +3,15 @@ from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 from cassandra.query import SimpleStatement
 import os
+from InternalControl import cInternalControl
 
-timeOut=70
-idControl=3
+objControl=cInternalControl()
+timeOut=objControl.timeout
+idControl=objControl.idControl
+hfolder=objControl.hfolder
+
 cloud_config= {
-        'secure_connect_bundle': '/app/appimpi/secure-connect-dbquart.zip'
+        'secure_connect_bundle': '/app/'+hfolder+'/secure-connect-dbquart.zip'
     }
               
 def cassandraBDProcess(json_doc):

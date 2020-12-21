@@ -6,7 +6,9 @@ from selenium.webdriver.chrome.options import Options
 import os
 import utils as tool
 import cassandraSent as bd
+from InternalControl import cInternalControl
 
+objControl=cInternalControl()
 chromedriver_autoinstaller.install()
 download_dir='/app/Downloadimpi'
 #Erase every file in download folder at the beginning to avoid mixed files
@@ -33,7 +35,7 @@ profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer
 
 options.add_experimental_option("prefs", profile)
 browser=webdriver.Chrome(options=options)
-idControl=3
+idControl=objControl.idControl
 querySt="select query,page,lscontrol from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
 resultSet=bd.returnQueryResult(querySt)
 lsControl=[]
