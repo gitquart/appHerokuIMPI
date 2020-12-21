@@ -33,7 +33,8 @@ profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer
 
 options.add_experimental_option("prefs", profile)
 browser=webdriver.Chrome(options=options)
-querySt="select query,page,lscontrol from thesis.cjf_control where id_control=5  ALLOW FILTERING"
+idControl=3
+querySt="select query,page,lscontrol from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
 resultSet=bd.returnQueryResult(querySt)
 lsControl=[]
 StartID=0
