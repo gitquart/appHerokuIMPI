@@ -1,4 +1,4 @@
 class cInternalControl:
-    idControl=5
+    idControl=6
     timeout=70
     hfolder='appimpi2017'     
