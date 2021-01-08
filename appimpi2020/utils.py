@@ -1,4 +1,5 @@
 from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
 import cassandraSent as bd
 import PyPDF2
 import uuid
@@ -8,12 +9,60 @@ import json
 import os
 import sys
 from textwrap import wrap
+from selenium import webdriver
 from InternalControl import cInternalControl
+from selenium.webdriver.chrome.options import Options
 
 objControl=cInternalControl()
 
 
-download_dir='/app/Download'+objControl.hfolder
+
+def checkDirAndCreate(folder):
+    print('Checking if download folder exists...')
+    folder=returnCorrectDownloadFolder(folder)
+    isdir = os.path.isdir(folder)
+    if isdir==False:
+        print('Creating download folder...')
+        os.mkdir(folder)  
+
+def returnCorrectDownloadFolder(folder):
+    if objControl.heroku:
+        folder='/app/'+objControl.download_dir
+    else:
+        folder='C:\\'+objControl.download_dir
+
+    return folder 
+
+def returnChromeSettings():
+    browser=''
+    chromedriver_autoinstaller.install()
+    if objControl.heroku:
+        #Chrome configuration for heroku
+        chrome_options= webdriver.ChromeOptions()
+        chrome_options.binary_location=os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+
+        browser=webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),chrome_options=chrome_options)
+
+    else:
+        options = Options()
+        profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
+               "download.default_directory": objControl.download_dir , 
+               "download.prompt_for_download": False,
+               "download.directory_upgrade": True,
+               "download.extensions_to_open": "applications/pdf",
+               "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
+               }           
+
+        options.add_experimental_option("prefs", profile)
+        browser=webdriver.Chrome(options=options)  
+
+    
+
+    return browser 
+
 
 def appendInfoToFile(path,filename,strcontent):
     txtFile=open(path+filename,'a+')
@@ -41,38 +90,43 @@ def processRows(browser,row,folderName):
             dt=browser.find_elements_by_xpath(xPathContent)[0].text  
             continue  
         if col==7:
-            row=int(row)-1
-            javaScript = "document.getElementById('MainContent_gdDoctosExpediente_ImageButton1_"+str(row)+"').click();"
-            browser.execute_script(javaScript)
-            #Get the name of the pdf document
-            time.sleep(10)
-            pdf_name=document.replace('/','_')
-            pdf_file_name=pdf_name+'.pdf'
-            pdf_source=''
-            pdf_source = browser.find_element_by_tag_name('iframe').get_attribute("src")
-            time.sleep(2)
-            if pdf_source!='':
-                #Get the url of the source
-                browser.get(pdf_source)
-                time.sleep(5)
-                #Finf the href with innerText 'aquí'
-                lst_link=browser.find_elements_by_tag_name('a')
-                linkFound=False
-                for link in lst_link:
-                    if linkFound==False:   
-                        if link.text=='aquí':
-                            linkFound=True
-                            link.click()
-                            #Wait 'X' seconds for download
-                            time.sleep(40) 
-                            #Get the expedient web page again, due to change of pages
-                            #it is needed to come back to a prior page
-                            browser.execute_script('window.history.go(-1)')
-                            browser.refresh()
-                            continue   
+            if objControl.enablePdf:
+                row=int(row)-1
+                javaScript = "document.getElementById('MainContent_gdDoctosExpediente_ImageButton1_"+str(row)+"').click();"
+                browser.execute_script(javaScript)
+                #Get the name of the pdf document
+                time.sleep(10)
+                pdf_name=document.replace('/','_')
+                pdf_file_name=pdf_name+'.pdf'
+                pdf_source=''
+                pdf_source = browser.find_element_by_tag_name('iframe').get_attribute("src")
+                time.sleep(2)
+                if pdf_source!='':
+                    #Get the url of the source
+                    browser.get(pdf_source)
+                    time.sleep(5)
+                    #Finf the href with innerText 'aquí'
+                    lst_link=browser.find_elements_by_tag_name('a')
+                    linkFound=False
+                    for link in lst_link:
+                        if linkFound==False:   
+                            if link.text=='aquí':
+                                linkFound=True
+                                link.click()
+                                #Wait 'X' seconds for download
+                                time.sleep(40) 
+                                #Get the expedient web page again, due to change of pages
+                                #it is needed to come back to a prior page
+                                browser.execute_script('window.history.go(-1)')
+                                browser.refresh()
+                                continue   
     
-    #Build the json by row           
-    json_doc=devuelveJSON('/app/'+objControl.hfolder+'/json_file.json')
+    #Build the json by row   
+    if objControl.heroku:        
+        json_doc=devuelveJSON('/app/'+objControl.hfolder+'/json_file.json')
+    else:
+        json_doc=devuelveJSON(objControl.rutaLocal+'/json_file.json')
+            
     json_doc['folder']=folderName
     json_doc['id']=str(uuid.uuid4())
     json_doc['barcode']=barcode
@@ -103,13 +157,17 @@ def processRows(browser,row,folderName):
     else:
         print('Keep going...record existed:',str(document))                       
 
-    #20-nov-2020: Stop this part meanwhile, insert metadata only
-    """        
-    for file in os.listdir(download_dir):
-        pdfDownloaded=True
-        processPDF(json_doc,lsRes)
-        os.remove(download_dir+'/'+file)
-    """    
+   
+    if objControl.enablePdf: 
+        download_dir=returnCorrectDownloadFolder(objControl.download_dir)    
+        for file in os.listdir(download_dir):
+            pdfDownloaded=True
+            processPDF(json_doc,lsRes)
+            if objControl.heroku:
+                os.remove(download_dir+'/'+file)
+            else:    
+                os.remove(download_dir+'\\'+file)
+        
             
 
 
@@ -164,8 +222,12 @@ def processPDF(json_sentencia,lsRes):
         if strFile=='PDF' or strFile=='pdf':
             strContent=readPDF(file) 
             print('Start wrapping text...') 
-            lsContent=wrap(strContent,1000)  
-            json_documento=devuelveJSON('/app/'+objControl.hfolder+'/json_documento.json')
+            lsContent=wrap(strContent,1000) 
+            if objControl.heroku: 
+                json_documento=devuelveJSON('/app/'+objControl.hfolder+'/json_documento.json')
+            else:
+                json_documento=devuelveJSON(objControl.rutaLocal+'/json_documento.json')
+
             if lsRes[0]:
                 json_documento['idDocumento']=json_sentencia['id']
             else:

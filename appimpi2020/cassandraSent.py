@@ -10,18 +10,28 @@ timeOut=objControl.timeout
 idControl=objControl.idControl
 hfolder=objControl.hfolder
 
-cloud_config= {
-        'secure_connect_bundle': '/app/'+hfolder+'/secure-connect-dbquart.zip'
-    }
+
+
+def getCluster():
+    #Connect to Cassandra
+    objCC=CassandraConnection()
+    cloud_config=''
+    if objControl.heroku:
+        cloud_config= {'secure_connect_bundle': objControl.rutaHeroku+'/secure-connect-dbquart.zip'}
+    else:
+        cloud_config= {'secure_connect_bundle': objControl.rutaLocal+'secure-connect-dbquart.zip'}
+
+
+    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
+    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider) 
+
+    return cluster  
               
 def cassandraBDProcess(json_doc):
      
     record_added=False
 
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=timeOut
     row=''
@@ -58,10 +68,7 @@ def cassandraBDProcess(json_doc):
 
 def updatePage(page):
 
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=timeOut
     page=str(page)
@@ -72,9 +79,7 @@ def updatePage(page):
     return True
 
 def returnQueryResult(querySt):
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=timeOut
     result=''
@@ -89,10 +94,7 @@ def insertPDF(json_doc):
      
     record_added=False
 
-    #Connect to Cassandra
-    objCC=CassandraConnection()
-    auth_provider = PlainTextAuthProvider(objCC.cc_user,objCC.cc_pwd)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster=getCluster()
     session = cluster.connect()
     session.default_timeout=timeOut
 

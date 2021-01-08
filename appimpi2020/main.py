@@ -9,32 +9,19 @@ import cassandraSent as bd
 from InternalControl import cInternalControl
 
 objControl=cInternalControl()
-chromedriver_autoinstaller.install()
-download_dir='/app/Downloadimpi'
+download_dir=tool.returnCorrectDownloadFolder(objControl.download_dir)
 #Erase every file in download folder at the beginning to avoid mixed files
-print('Checking if download folder exists...')
-isdir = os.path.isdir(download_dir)
-if isdir==False:
-    print('Creating download folder...')
-    os.mkdir(download_dir)
-print('Download directory created...')
+tool.checkDirAndCreate(download_dir)
 for file in os.listdir(download_dir):
-    os.remove(download_dir+'/'+file)
+    if objControl.heroku:
+        os.remove(download_dir+'/'+file)
+    else:
+         os.remove(download_dir+'\\'+file)
 
 print('Download folder empty...')
-#Set options for chrome
-options = Options()
 
-profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
-               "download.default_directory": download_dir , 
-               "download.prompt_for_download": False,
-               "download.directory_upgrade": True,
-               "download.extensions_to_open": "applications/pdf",
-               "plugins.always_open_pdf_externally": True #It will not show PDF directly in chrome
-               }           
 
-options.add_experimental_option("prefs", profile)
-browser=webdriver.Chrome(options=options)
+browser=tool.returnChromeSettings()
 idControl=objControl.idControl
 querySt="select query,page,lscontrol from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
 resultSet=bd.returnQueryResult(querySt)
