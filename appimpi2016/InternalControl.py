@@ -1,9 +1,9 @@
 import os
 
 class cInternalControl:
-    idControl=6
+    idControl=5
     timeout=70
-    version='2017'
+    version='2016'
     hfolder='appimpi'+version   
     heroku=True
     rutaHeroku='/app/'+hfolder
