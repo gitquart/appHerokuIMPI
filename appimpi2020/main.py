@@ -31,7 +31,7 @@ StartID=0
 if resultSet: 
     for row in resultSet:
         print('Service name:',str(row[0]))
-        print('Starting page::',str(row[1]))
+        print('Starting page:',str(row[1]))
         StartID=int(str(row[1]))
         for e in row[2]:
             lsControl.append(e)
