@@ -150,6 +150,10 @@ def processRows(browser,row,folderName):
     json_doc['year']=int(dYear)
     #Check if a pdf exists 
 
+    if not objControl.enablePdf:
+        print('Adding a time sleep of 10 secs to slow down cassandra...(when pdf is off only)')
+        time.sleep(10)
+
     #Insert information to cassandra
     lsRes=bd.cassandraBDProcess(json_doc)
     if lsRes[0]:
