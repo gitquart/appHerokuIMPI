@@ -159,7 +159,8 @@ def processRows(browser,row,folderName):
     if lsRes[0]:
         print('Record added:',str(document))
     else:
-        print('Keep going...record existed:',str(document))                       
+        print('Keep going...record existed:',str(document))
+                            
 
    
     if objControl.enablePdf: 

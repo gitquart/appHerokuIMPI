@@ -89,6 +89,16 @@ def returnQueryResult(querySt):
 
     return result  
 
+def executeNonQuery(querySt):
+    cluster=getCluster()
+    session = cluster.connect()
+    session.default_timeout=timeOut
+    future = session.execute_async(querySt)
+    future.result()
+    cluster.shutdown()
+
+    return True  
+
 
 def insertPDF(json_doc):
      
