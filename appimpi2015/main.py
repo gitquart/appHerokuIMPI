@@ -23,20 +23,22 @@ print('Download folder empty...')
 
 browser=tool.returnChromeSettings()
 idControl=objControl.idControl
-querySt="select query,page,lscontrol from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
+querySt="select query,page,lscontrol,limit_iteration from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
 resultSet=bd.returnQueryResult(querySt)
 lsControl=[]
 StartID=0
+EndID=0
 
 if resultSet: 
     for row in resultSet:
         print('Service name:',str(row[0]))
         print('Starting page:',str(row[1]))
         StartID=int(str(row[1]))
+        EndID=int(str(row[3]))
         for e in row[2]:
             lsControl.append(e)
             
-EndID=14000
+
 while(StartID<=EndID):
     #This iteration gets each file
     urlExp="https://vidoc.impi.gob.mx/visor?usr=SIGA&texp=SI&tdoc=E&id="+str(lsControl[0])+"/"+str(lsControl[1])+"/"+str(lsControl[2])+"/"+str(StartID).zfill(6)
