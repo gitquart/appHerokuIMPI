@@ -50,20 +50,6 @@ while(StartID<=EndID):
         time.sleep(10)
         if browser.find_elements_by_xpath('//*[@id="divAlertas"]/div/strong').count==0:
             print('------No existe el expediente solicitado------')
-            StartID=StartID+1
-            bd.updatePage(StartID) 
-            #Look and update nolimit count
-            query="select noinfolimit from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
-            resultSet=bd.returnQueryResult(query)
-            if resultSet:
-                for row in resultSet:
-                    countNoFound=int(str(row[0]))
-                    countNoFound+=1
-                    query="update thesis.cjf_control set noinfolimit="+str(countNoFound)+" where id_control="+str(idControl)+";" 
-                    bd.executeNonQuery(query)
-                    if countNoFound>=20:
-                        print('20 times NOT FOUND reached, please change query initial conditions') 
-                        os.sys.exit(0)     
         else:
             print('No alert of NO FILE found...all good')
             table=browser.find_elements_by_xpath('//*[@id="MainContent_gdDoctosExpediente"]')
@@ -76,15 +62,33 @@ while(StartID<=EndID):
                 folderName=str(folderChunks[1])
                 print('Adding folder: ',folderName)
                 rows = browser.find_elements_by_xpath("//*[@id='MainContent_gdDoctosExpediente']/tbody/tr")
-                nRows=len(rows)+1
-                for trow in range(1,nRows):
-                    tool.processRows(browser,trow,folderName)
-                print('-------------Page done-------------')
-                StartID=StartID+1
-                bd.updatePage(StartID)
-                print('Restarting sequential NO FOUND counter to Zero')
-                query="update thesis.cjf_control set noinfolimit=0 where id_control="+str(idControl)+";"
-                bd.executeNonQuery(query)
+                totalRows=len(rows)
+                if totalRows>0:
+                    nRows=len(rows)+1
+                    for trow in range(1,nRows):
+                        tool.processRows(browser,trow,folderName)
+                    print('-------------Page done-------------')
+                    StartID=StartID+1
+                    bd.updatePage(StartID)
+                    print('Restarting sequential NO FOUND counter to Zero')
+                    query="update thesis.cjf_control set noinfolimit=0 where id_control="+str(idControl)+";"
+                    bd.executeNonQuery(query)
+                else:
+                    #No rows, then sequential increments    
+                    StartID=StartID+1
+                    bd.updatePage(StartID) 
+                    #Look and update nolimit count
+                    query="select noinfolimit from thesis.cjf_control where id_control="+str(idControl)+"  ALLOW FILTERING"
+                    resultSet=bd.returnQueryResult(query)
+                    if resultSet:
+                        for row in resultSet:
+                            countNoFound=int(str(row[0]))
+                            countNoFound+=1
+                            query="update thesis.cjf_control set noinfolimit="+str(countNoFound)+" where id_control="+str(idControl)+";" 
+                            bd.executeNonQuery(query)
+                            if countNoFound>=20:
+                                print('20 times NOT FOUND reached, please change query initial conditions') 
+                                os.sys.exit(0)     
             else:
                 print('No table found...')
 
